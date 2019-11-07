@@ -14,10 +14,10 @@
     <PackageIconUrl>http://www.rfranco.com/rfjobs/wp-content/uploads/2018/06/logo_pica_grupo.png</PackageIconUrl>
     <PackageTags>Nancy NancyFx Prometheus Metrics Exposition</PackageTags>
     <IncludeSource>false</IncludeSource>
-  </PropertyGroup>
-  <PackageReleaseNotes>
+    <PackageReleaseNotes>
       Custom metrics renamed.
   </PackageReleaseNotes>
+  </PropertyGroup>  
   <ItemGroup>
     <PackageReference Include="Nancy" Version="1.4.5" />
     <PackageReference Include="prometheus-net" Version="3.2.1" />
