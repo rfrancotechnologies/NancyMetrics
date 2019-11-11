@@ -18,7 +18,7 @@ Custom metrics defined:
     - A Summary of request duration in seconds over last 10 minutes per method path template).
     - A histogram of HTTP requests duration in seconds per method (path template).
 
-To `update the metrics` exposed, you should to register `NancyMetricsCollector` on `ApplicationStartup` method and call `UpdateMetrics(...)` from  `RequestStartup` method of your bootstrapper:
+To `update the metrics` exposed, you should to register `NancyMetricsCollector` on `ApplicationStartup` method and call `UpdateMetrics(...)` or `UpdateMetricsOnError(...)` from  `RequestStartup` method of your bootstrapper:
 
 ```csharp
 protected override void ApplicationStartup(IKernel container, IPipelines pipelines)
@@ -34,6 +34,9 @@ protected override void RequestStartup(IKernel requestContainer, IPipelines pipe
 {
     ...
     requestContainer.Get<NancyMetricsCollector>().UpdateMetrics(pipelines, context);
+    ...
+    //  if error
+    requestContainer.Get<NancyMetricsCollector>().UpdateMetricsOnError(pipelines, context);
     ...
 }
 ```
