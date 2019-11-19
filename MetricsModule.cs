@@ -9,7 +9,7 @@ namespace Com.RFranco.Iris.NancyMetrics.Modules
     {
         public MetricsModule()
         {
-            Get["/metrics"] = parameters =>
+            Get("/metrics", _ => 
             {
                 var response = new Response();
                 response.ContentType = "text/html";
@@ -33,7 +33,7 @@ namespace Com.RFranco.Iris.NancyMetrics.Modules
                 response.StatusCode = HttpStatusCode.OK;
 
                 return response;
-            };
+            });
 
         }
     }
