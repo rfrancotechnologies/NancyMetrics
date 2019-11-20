@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using Nancy;
 using Prometheus;
 
@@ -9,32 +10,18 @@ namespace Com.RFranco.Iris.NancyMetrics.Modules
     {
         public MetricsModule()
         {
-            Get("/metrics", _ => 
-            {
-                var response = new Response();
-                response.ContentType = "text/html";
-                try
-                {
-                    response.Contents = async s =>
-                    {
-                        await Metrics.DefaultRegistry.CollectAndExportAsTextAsync(s);
-                    };
-                }
-                catch (Exception e)
-                {
-                    response.StatusCode = HttpStatusCode.InternalServerError;
-                    response.Contents = s =>
-                    {
-                        using (var writer = new StreamWriter(s))
-                            writer.Write(e.Message);
-                    };
-                }
-
-                response.StatusCode = HttpStatusCode.OK;
-
-                return response;
-            });
+            Get("/metrics", _ => Response.AsText(GetMetrics().Result));
 
         }
+
+        private async Task<string> GetMetrics()
+        {
+            using (var ms = new MemoryStream())
+            {
+                await Metrics.DefaultRegistry.CollectAndExportAsTextAsync(ms);
+                return System.Text.Encoding.UTF8.GetString(ms.ToArray()); 
+            }            
+        }
+
     }
 }
