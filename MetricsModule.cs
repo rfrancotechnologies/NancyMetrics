@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
 using Nancy;
 using Prometheus;
@@ -10,7 +9,7 @@ namespace Com.RFranco.Iris.NancyMetrics.Modules
     {
         public MetricsModule()
         {
-            Get("/metrics", _ => Response.AsText(GetMetrics().Result));
+            Get["/metrics"] = _ => Response.AsText(GetMetrics().Result);
 
         }
 

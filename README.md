@@ -1,6 +1,6 @@
 # NancyMetrics
 
-Prometheus metrics instrumentation on [NancyFx](http://nancyfx.org/) applications.
+Prometheus metrics instrumentation on [NancyFx 1.x](http://nancyfx.org/) applications.
 
 ## Why NancyMetrics
 
