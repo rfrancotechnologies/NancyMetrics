@@ -1,6 +1,6 @@
 # NancyMetrics
 
-Prometheus metrics instrumentation on [NancyFx](http://nancyfx.org/) applications.
+Prometheus metrics instrumentation on [NancyFx 2.x](http://nancyfx.org/) applications.
 
 ## Why NancyMetrics
 
@@ -18,16 +18,32 @@ Custom metrics defined:
     - A Summary of request duration in seconds over last 10 minutes per method path template).
     - A histogram of HTTP requests duration in seconds per method (path template).
 
-To `update the metrics` exposed, you should to register `NancyMetricsCollector` on `ApplicationStartup` method and call `UpdateMetrics(...)` or `UpdateMetricsOnError(...)` from  `RequestStartup` method of your bootstrapper:
+To `update the metrics` exposed, you should:
+
+1) Register `NancyMetricsCollector` on `ApplicationStartup` method:
 
 ```csharp
 protected override void ApplicationStartup(IKernel container, IPipelines pipelines)
         {
             ...
-            container.Bind<NancyMetricsCollector>().ToConstant(new NancyCollector(container.Get<IRouteResolver>()));
+            container.Bind<NancyMetricsCollector>().ToConstant(new NancyMetricsCollector(container.Get<IRouteResolver>()));
             ...
         }
 ```
+
+Its also possible to configure the middleware overriding the default behavior (ignoring calls that contains`/swagger`, `/health` and `/metrics` in the path) passing a list of path to be ignored as parameters (in the next example, we are excluding calls that contains `/swagger` in the path):
+
+```csharp
+protected override void ApplicationStartup(IKernel container, IPipelines pipelines)
+        {
+            ...
+            container.Bind<NancyMetricsCollector>().ToConstant(new NancyMetricsCollector(container.Get<IRouteResolver>()),
+                new NancyMetricsCollectorOptions{ExcludedPaths = new List<string>{"/swagger"}});
+            ...
+        }
+```
+
+2)Call `UpdateMetrics(...)` or `UpdateMetricsOnError(...)` from  `RequestStartup` method of your bootstrapper
 
 ```csharp
 protected override void RequestStartup(IKernel requestContainer, IPipelines pipelines, NancyContext context)
