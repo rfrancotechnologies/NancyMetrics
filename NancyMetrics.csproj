@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
-    <Version>0.2.3</Version>
+    <Version>0.2.4</Version>
     <PackageId>Com.RFranco.Iris.NancyMetrics</PackageId>
     <Title>NancyMetrics</Title>
     <Summary>Library providing prometheus metrics to a NancyFx application.</Summary>
@@ -15,7 +15,7 @@
     <PackageTags>Nancy NancyFx Prometheus Metrics Exposition</PackageTags>
     <IncludeSource>false</IncludeSource>
     <PackageReleaseNotes>
-       Metrics renamed.
+       Customize Buckets.
   </PackageReleaseNotes>
   </PropertyGroup>  
   <ItemGroup>
