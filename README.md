@@ -55,7 +55,7 @@ protected override void ApplicationStartup(IKernel container, IPipelines pipelin
         }
 ```
 
-By default, it uses the next list of buckets `{.1, .25, 1, 2.5, 5 }`.
+By default, it uses the next list of buckets `{ .005, .01, .025, .05, .075, .1, .25, .5, .75, 1, 2.5, 5, 7.5, 10 }`.
 
 2)Call `UpdateMetrics(...)` or `UpdateMetricsOnError(...)` from  `RequestStartup` method of your bootstrapper
 
