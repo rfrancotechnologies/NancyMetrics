@@ -10,22 +10,31 @@ namespace Com.RFranco.Iris.NancyMetrics.Stats
 
     public class NancyMetricsCollector
     {
-        
-        private IRouteResolver RouteResolver;
 
+        private IRouteResolver RouteResolver;
         private NancyMetricsCollectorOptions Options;
+
         private const string RequestDateTimeNancyContextItem = "RequestDateTime";
 
         private const string UNKNOWN_REQUEST_PATH = "NotFound";
-        private static readonly Counter ErrorRequestsProcessed = Metrics.CreateCounter("server_request_error_total", "Number of unsuccessfull processed requests.", "method", "error_code");
-        private static readonly Gauge OngoingRequests = Metrics.CreateGauge("server_request_in_progress", "Number of ongoing requests.", "method");
-        private static readonly Histogram RequestResponseHistogram = Metrics.CreateHistogram("server_request_duration_seconds", "Histogram of request duration in seconds.", "method");
+        private Counter ErrorRequestsProcessed;
+        private Gauge OngoingRequests;
+        private Histogram RequestResponseHistogram;
 
         public NancyMetricsCollector(IRouteResolver routeResolver, NancyMetricsCollectorOptions options = null)
         {
             RouteResolver = routeResolver;
             Options = options ?? new NancyMetricsCollectorOptions();
+            
+            ErrorRequestsProcessed = Metrics.CreateCounter("server_request_error_total", "Number of unsuccessfull processed requests.", "method", "error_code");
+            OngoingRequests = Metrics.CreateGauge("server_request_in_progress", "Number of ongoing requests.", "method");
+            RequestResponseHistogram = Metrics.CreateHistogram("server_request_duration_seconds", "Histogram of request duration in seconds.",
+                new HistogramConfiguration() {
+                    LabelNames = new string[]{"method"},
+                    Buckets = Options.Buckets
+                });           
         }
+
 
         public void UpdateMetrics(IPipelines pipelines, NancyContext context)
         {
@@ -44,7 +53,7 @@ namespace Com.RFranco.Iris.NancyMetrics.Stats
                 {
                     RequestResponseHistogram.Labels(fullMethodName).Observe((DateTime.UtcNow - (DateTime)ctx.Items[RequestDateTimeNancyContextItem]).TotalSeconds);
                     OngoingRequests.Labels(fullMethodName).Dec();
-                });            
+                });
             }
         }
 
@@ -53,8 +62,10 @@ namespace Com.RFranco.Iris.NancyMetrics.Stats
             if (MustBeObserved(context))
             {
                 string fullMethodName = GetRequestPathTemplate(context);
-                
-                ErrorRequestsProcessed.Labels(fullMethodName, ((int)context.Response.StatusCode).ToString()).Inc();
+
+                if((int)context.Response.StatusCode >= 400)
+                    ErrorRequestsProcessed.Labels(fullMethodName, ((int)context.Response.StatusCode).ToString()).Inc();
+
                 RequestResponseHistogram.Labels(fullMethodName).Observe((DateTime.UtcNow - (DateTime)context.Items[RequestDateTimeNancyContextItem]).TotalSeconds);
                 OngoingRequests.Labels(fullMethodName).Dec();
             }
