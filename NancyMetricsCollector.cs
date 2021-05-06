@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Nancy;
 using Nancy.Bootstrapper;
@@ -21,7 +22,15 @@ namespace Com.RFranco.Iris.NancyMetrics.Stats
         private Gauge OngoingRequests;
         private Histogram RequestResponseHistogram;
 
-        public NancyMetricsCollector(IRouteResolver routeResolver, NancyMetricsCollectorOptions options = null)
+        public NancyMetricsCollector(IRouteResolver routeResolver, NancyMetricsCollectorOptions options = null, bool registerDefaultCollectors = true) :
+            this(routeResolver, 
+                (registerDefaultCollectors ? new List<ISystemMetricCollector>(){new ThreadPoolCollector()} : new List<ISystemMetricCollector>()), 
+                options)
+        {
+            
+        }
+
+        public NancyMetricsCollector(IRouteResolver routeResolver, IEnumerable<ISystemMetricCollector> collectors, NancyMetricsCollectorOptions options = null)
         {
             RouteResolver = routeResolver;
             Options = options ?? new NancyMetricsCollectorOptions();
@@ -32,7 +41,12 @@ namespace Com.RFranco.Iris.NancyMetrics.Stats
                 new HistogramConfiguration() {
                     LabelNames = new string[]{"method"},
                     Buckets = Options.Buckets
-                });           
+                });
+            var registry = Metrics.DefaultRegistry;
+            foreach (var collector in collectors)
+			{
+				registry.AddBeforeCollectCallback(collector.UpdateMetrics);
+			}
         }
 
 
